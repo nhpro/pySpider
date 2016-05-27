@@ -1,4 +1,7 @@
 #encoding=utf-8
+'''
+@这个工具爬取天津大学学生在图书馆的借阅记录
+'''
 import sys
 import urllib
 import urllib2
@@ -12,7 +15,7 @@ def saveToFile(stuID):
 	cookie = cookielib.MozillaCookieJar(fileName)
 	opener= urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
 
-	# 登陆并获得cookie
+	# 登陆并获得cookie，用来稍后去访问借阅历史页面
 	loginPost = {
 		'rdid':str(stuID),
 		'rdPasswd':'670b14728ad9902aecba32e22fa4f6bd'
@@ -43,9 +46,8 @@ def saveToFile(stuID):
 	patternTr = re.compile('<tr>(.*?)</tr>',re.S)
 	# 每一行的内容
 	patternTdCon = re.compile('<td.*?>(.*?)</td>')
-	# 调试信息，检测信息是否完整
-	tmpNum = 1;
 	for curPage in range(1,pages+1):
+		# params 的内容用来翻页
 		params = {
 		'page':str(curPage),
 		'rows':'10',
@@ -80,6 +82,7 @@ def saveToFile(stuID):
 			tds = item.find_all('td')
 			print '\n'
 			print stuID
+			# 内容存储
 			toFile.write(str(stuID))
 			toFile.write('\t')
 
@@ -94,7 +97,8 @@ def saveToFile(stuID):
 if __name__=="__main__":
 	reload(sys)
 	sys.setdefaultencoding('utf-8')
-	idfile = open("stuIDStatus_1.txt","r")
+	#stuIDStatus.txt文件中记录了借阅证号
+	idfile = open("stuIDStatus.txt","r")
 	data = idfile.readlines()
 	for item in data:
 		print int(item)
